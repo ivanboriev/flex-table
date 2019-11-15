@@ -39,7 +39,7 @@ class Body extends React.Component {
 								key={element.id}
 							/>
 							{isGroupExpanded &&
-								element.childs.map(el => {
+								element.categories.map(el => {
 									const isSubGroupExpanded = expandedGroups.has(el)
 									return (
 										<Panel
