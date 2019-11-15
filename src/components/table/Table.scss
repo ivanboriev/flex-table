@@ -1,0 +1,45 @@
+// Settings
+$bg-wrapper-color: #e4e4e4;
+$wrapper-height: calc(100vh -80px);
+
+.table_wrapper {
+  background-color: $bg-wrapper-color;
+  max-height: $wrapper-height;
+  min-width: 960px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  .body {
+    display: flex;
+    flex-direction: column;
+    .panel {
+      padding: 8px;
+      border-bottom: 1px solid #c4c4c4;
+      cursor: pointer;
+
+      .title {
+        font-size: 1.1em;
+        font-weight: bold;
+      }
+      .arrow {
+        margin-right: 8px;
+      }
+
+      .arrow::before {
+        content: '';
+        display: inline-block;
+        width: 0.5em;
+        height: 0.5em;
+        border-right: 0.1em solid black;
+        border-top: 0.1em solid black;
+        transform: rotate(45deg);
+        margin-right: 0.5em;
+        transition: 0.25s;
+      }
+
+      .arrow.down::before {
+        transform: rotate(135deg);
+        transition: transform 0.25s;
+      }
+    }
+  }
+}
