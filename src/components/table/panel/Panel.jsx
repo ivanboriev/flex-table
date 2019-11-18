@@ -1,24 +1,27 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const Panel = props => {
-	const { title, expanded, onClick } = props
-	return (
-		<div className={expanded ? 'panel expanded' : 'panel'} onClick={onClick} aria-hidden>
-			<span className={expanded ? 'arrow down' : 'arrow'} />
-			<span className='title'>{title}</span>
-		</div>
-	)
-}
+  const { title, expanded, className, hasChilds, onClick } = props;
+  return (
+    <div className={`panel ${className}`} onClick={onClick} aria-hidden>
+      {hasChilds ? <span className={expanded ? 'arrow down' : 'arrow'} /> : null}
+      <span className="title">{title}</span>
+    </div>
+  );
+};
 
 Panel.defaultProps = {
-	expanded: false,
-}
+  expanded: false,
+  hasChilds: false,
+};
 
 Panel.propTypes = {
-	title: PropTypes.string.isRequired,
-	onClick: PropTypes.func.isRequired,
-	expanded: PropTypes.bool,
-}
+  title: PropTypes.string.isRequired,
+  className: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  expanded: PropTypes.bool,
+  hasChilds: PropTypes.bool,
+};
 
-export default Panel
+export default Panel;

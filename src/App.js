@@ -25215,10 +25215,38 @@ const data = [
 	}
 ]
 
+const columns = [
+{
+	key:'date',
+	title:"Дата",
+	dataIndex:"date"
+},
+{
+	key:'name',
+	title:"Номенклатура",
+	dataIndex:"name"
+},
+{
+	key:'price',
+	title:"Цена",
+	dataIndex:"price"
+},
+{
+	key:'quantity',
+	title:"Количество",
+	dataIndex:"quantity"
+},
+{
+	key:'sum',
+	title:"Сумма",
+	dataIndex:"sum"
+}
+];
+
 function App() {
 	return (
 		<div className='App'>
-			<Table dataSource={data} />
+			<Table dataSource={data} columns={columns} />
 		</div>
 	)
 }

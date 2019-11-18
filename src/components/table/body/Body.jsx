@@ -1,65 +1,110 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import Panel from '../panel/Panel'
+import React from 'react';
+import PropTypes from 'prop-types';
+import Panel from '../panel/Panel';
+import DataTable from '../data-table/DataTable';
 
 class Body extends React.Component {
-	constructor(props) {
-		super(props)
-		this.state = {
-			expandedGroups: new Set(),
-		}
-	}
+  constructor(props) {
+    super(props);
 
-	handleClick(element) {
-		const { expandedGroups } = this.state
+    this.state = {
+      data: [],
+    };
+  }
+  flatDataSource = (data = [], parent = {}, visible = true) => {
+    return data.reduce((acc, item) => {
+      if (Object.keys(parent).length > 0) {
+        item.parentId = parent.id;
+        item.id = `${item.id}-${parent.id}`;
+      } else {
+        item.parentId = null;
+      }
 
-		const copyExpandedGroups = new Set([...expandedGroups])
+      if (item.categories) {
+        item.hasChilds = true;
+        item.childName = 'categories';
+        item.visible = visible;
+        item.class = 'category';
 
-		if (!copyExpandedGroups.delete(element)) {
-			copyExpandedGroups.add(element)
-		}
-		this.setState({
-			expandedGroups: copyExpandedGroups,
-		})
-	}
+        return [...acc, item, ...this.flatDataSource(item.categories, item, false)];
+      }
 
-	render() {
-		const { dataSource } = this.props
-		const { expandedGroups } = this.state
-		return (
-			<div className='body'>
-				{dataSource.map(element => {
-					const isGroupExpanded = expandedGroups.has(element)
-					return (
-						<React.Fragment key={element.id}>
-							<Panel
-								title={element.name}
-								onClick={() => this.handleClick(element)}
-								expanded={isGroupExpanded}
-								key={element.id}
-							/>
-							{isGroupExpanded &&
-								element.categories.map(el => {
-									const isSubGroupExpanded = expandedGroups.has(el)
-									return (
-										<Panel
-											title={el.name}
-											onClick={() => this.handleClick(el)}
-											expanded={isSubGroupExpanded}
-											key={el.id}
-										/>
-									)
-								})}
-						</React.Fragment>
-					)
-				})}
-			</div>
-		)
-	}
+      if (item.items) {
+        item.hasChilds = true;
+        item.childName = 'items';
+        item.visible = visible;
+        item.class = 'item';
+
+        return [...acc, item, ...this.flatDataSource(item.items, item, false)];
+      }
+      item.hasChilds = false;
+      item.visible = visible;
+      return [...acc, item];
+    }, []);
+  };
+
+  componentDidMount() {
+    const { dataSource } = this.props;
+    const flatData = this.flatDataSource(dataSource);
+    this.setState({ data: flatData });
+  }
+
+  toggleChilds = childs => {
+    return childs.map(element => {
+      element.visible = !element.visible;
+      return element;
+    });
+  };
+
+  handleClick(element) {
+    const { data } = this.state;
+    element.expanded = !element.expanded;
+    const changedData = data.map(el => {
+      if (el.parentId === element.id) {
+        el.visible = !el.visible;
+        el.expanded = !el.expanded;
+      }
+      if (!el.visible && el.hasChilds) {
+        return el[el.childName].map(e => {
+          e.visible = false;
+          e.expanded = false;
+        });
+      }
+      return el;
+    });
+
+    this.setState({ data: changedData });
+  }
+
+  render() {
+    const { data } = this.state;
+    const { dataKeys } = this.props;
+    const filteredData = data.filter(el => el.visible === true);
+    return (
+      <div className="body">
+        {filteredData.map(el => {
+          const expanded = el.expanded;
+          const hasChilds = el.hasChilds;
+          return hasChilds ? (
+            <Panel
+              key={el.id}
+              title={el.name}
+              onClick={() => this.handleClick(el)}
+              expanded={expanded}
+              className={el.class}
+              hasChilds={el.hasChilds}
+            />
+          ) : (
+            <DataTable item={el} dataKeys={dataKeys} />
+          );
+        })}
+      </div>
+    );
+  }
 }
 
 Body.propTypes = {
-	dataSource: PropTypes.arrayOf(PropTypes.object).isRequired,
-}
+  dataSource: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
 
-export default Body
+export default Body;
