@@ -11,22 +11,22 @@ const Table = props => {
       if (item.children) {
         return [...acc, ...getKeys(item.children)];
       }
-      return [...acc, item.dataIndex];
+      return [...acc, item.index];
     }, []);
 
   const dataKeys = getKeys(columns);
-  console.log(dataKeys);
+
   return (
     <div className="table_wrapper">
       <div className="table">
-        {header && <Header />}
+        {header && <Header columns={columns} />}
         {dataSource && <Body dataSource={dataSource} dataKeys={dataKeys} />}
       </div>
     </div>
   );
 };
 Table.defaultProps = {
-  header: false,
+  header: true,
 };
 
 Table.propTypes = {

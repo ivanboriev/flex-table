@@ -19,6 +19,7 @@ class Body extends React.Component {
       } else {
         item.parentId = null;
       }
+      item.expanded = false;
 
       if (item.categories) {
         item.hasChilds = true;
@@ -37,6 +38,7 @@ class Body extends React.Component {
 
         return [...acc, item, ...this.flatDataSource(item.items, item, false)];
       }
+
       item.hasChilds = false;
       item.visible = visible;
       return [...acc, item];
@@ -49,29 +51,44 @@ class Body extends React.Component {
     this.setState({ data: flatData });
   }
 
-  toggleChilds = childs => {
-    return childs.map(element => {
-      element.visible = !element.visible;
-      return element;
+  close = element => {
+    element.expanded = false;
+    element.visible = false;
+    return element;
+  };
+  open = element => {
+    element.expanded = true;
+    element.visible = true;
+    return element;
+  };
+
+  toggleElement = element => {
+    const { data } = this.state;
+    const index = data.indexOf(element);
+    data[index].expanded = !data[index].expanded;
+
+    const chData = data.map(el => {
+      if (el.parentId === data[index].id) {
+        if (!data[index].expanded) {
+          el.expanded = false;
+        }
+        el.visible = !el.visible;
+        if (el.hasChilds && !data[index].expanded) {
+          el[el.childName].forEach(e => {
+            e.visible = false;
+            e.expanded = false;
+          });
+        }
+      }
+
+      return el;
     });
+
+    return chData;
   };
 
   handleClick(element) {
-    const { data } = this.state;
-    element.expanded = !element.expanded;
-    const changedData = data.map(el => {
-      if (el.parentId === element.id) {
-        el.visible = !el.visible;
-        el.expanded = !el.expanded;
-      }
-      if (!el.visible && el.hasChilds) {
-        return el[el.childName].map(e => {
-          e.visible = false;
-          e.expanded = false;
-        });
-      }
-      return el;
-    });
+    const changedData = this.toggleElement(element);
 
     this.setState({ data: changedData });
   }
@@ -79,7 +96,7 @@ class Body extends React.Component {
   render() {
     const { data } = this.state;
     const { dataKeys } = this.props;
-    const filteredData = data.filter(el => el.visible === true);
+    const filteredData = data.filter(el => el.visible);
     return (
       <div className="body">
         {filteredData.map(el => {

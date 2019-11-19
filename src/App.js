@@ -25219,27 +25219,27 @@ const columns = [
 {
 	key:'date',
 	title:"Дата",
-	dataIndex:"date"
+	index:"date"
 },
 {
 	key:'name',
 	title:"Номенклатура",
-	dataIndex:"name"
+	index:"name"
 },
 {
 	key:'price',
 	title:"Цена",
-	dataIndex:"price"
+	index:"price"
 },
 {
 	key:'quantity',
 	title:"Количество",
-	dataIndex:"quantity"
+	index:"quantity"
 },
 {
 	key:'sum',
 	title:"Сумма",
-	dataIndex:"sum"
+	index:"sum"
 }
 ];
 

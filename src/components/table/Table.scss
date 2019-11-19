@@ -1,6 +1,8 @@
 // Settings
 $bg-wrapper-color: #e4e4e4;
-$wrapper-height: calc(100vh -80px);
+$bg-header: #d7d7d7;
+$wrapper-height: calc(100% - 60px);
+$border: 1px solid #c4c4c4;
 
 .table_wrapper {
   background-color: $bg-wrapper-color;
@@ -8,13 +10,35 @@ $wrapper-height: calc(100vh -80px);
   min-width: 960px;
   overflow-x: auto;
   overflow-y: hidden;
+  .header {
+    display: flex;
+    justify-content: space-around;
+    min-height: 60px;
+    border-bottom: $border;
+    background-color: $bg-header;
+    .col {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      border-right: $border;
+      span {
+        font-weight: bold;
+      }
+    }
+    .col:last-child {
+      border: none;
+    }
+  }
   .body {
     display: flex;
     flex-direction: column;
+
     .panel {
       padding: 8px;
-      border-bottom: 1px solid #c4c4c4;
+      border-bottom: $border;
       cursor: pointer;
+      display: flex;
 
       .title {
         font-size: 1.1em;
@@ -39,6 +63,26 @@ $wrapper-height: calc(100vh -80px);
       .arrow.down::before {
         transform: rotate(135deg);
         transition: transform 0.25s;
+      }
+      .col {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        border-right: $border;
+        padding: 8px;
+        span {
+          font-weight: normal;
+        }
+        &.text-left {
+          justify-content: flex-start;
+        }
+        &.text-right {
+          justify-content: flex-end;
+        }
+      }
+      .col:last-child {
+        border: none;
       }
     }
   }
