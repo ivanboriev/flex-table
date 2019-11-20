@@ -101,6 +101,9 @@ $border: 1px solid #c4c4c4;
         display: flex;
         margin-left: 0;
         background-color: $bg-data-table;
+        &:nth-child(even) {
+          background-color: #eff9f1;
+        }
       }
     }
   }

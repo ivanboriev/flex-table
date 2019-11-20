@@ -69,34 +69,6 @@ class Body extends React.Component {
     this.setState({ data: flatData });
   }
 
-  // toggleChilds = (element, array, trueOrFalse) => {
-  //   array.forEach(el => {
-  //     if (el.parentId === element.id) {
-  //       el.visible = trueOrFalse;
-  //     }
-  //   });
-  // };
-
-  // toggleElement = element => {
-  //   const { data } = this.state;
-  //   const index = data.indexOf(element);
-  //   const clone = cloneDeep(data);
-  //   const isExpand = (clone[index].expanded = !clone[index].expanded);
-  //   if (element.hasChilds) {
-  //     return clone.map((el, i, arr) => {
-  //       if (el.parentId === element.id) {
-  //         el.visible = !el.visible;
-  //         isExpand ? (el.expanded = false) : (el.expanded = true);
-  //         if (el.hasChilds) {
-  //           this.toggleChilds(el, arr, false);
-  //         }
-  //       }
-  //       return el;
-  //     });
-  //   }
-  //   return clone;
-  // };
-
   toggleElement(element) {
     const { data } = this.state;
     const isExpand = (element.expanded = !element.expanded);
@@ -130,7 +102,6 @@ class Body extends React.Component {
 
   render() {
     const { data } = this.state;
-
     const { dataKeys } = this.props;
     const filteredData = data.filter(el => el.visible);
     return (
