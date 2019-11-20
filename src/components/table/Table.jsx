@@ -25,6 +25,7 @@ const Table = props => {
     </div>
   );
 };
+
 Table.defaultProps = {
   header: true,
 };

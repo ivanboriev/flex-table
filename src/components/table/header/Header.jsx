@@ -6,7 +6,7 @@ const Header = props => {
   const { columns } = props;
 
   return (
-    <div className="header">
+    <div className="header fixed">
       {columns.map(el => {
         return <Col key={el.key} text={el.title} />;
       })}

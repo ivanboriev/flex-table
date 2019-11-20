@@ -8,9 +8,9 @@ const DataTable = props => {
     <div className="panel data">
       {dataKeys.map((el, i) => {
         return el === 'date' ? (
-          <Col text="" />
+          <Col key={item.id + i} text=" " />
         ) : (
-          <Col key={`col-${item.id}-${i}`} text={item[el]} left={el === 'name' ? true : false} />
+          <Col key={`col-${item.id}-${i}`} text={item[el]} left={el === 'name'} />
         );
       })}
     </div>
@@ -22,7 +22,9 @@ DataTable.defaultProps = {
 };
 
 DataTable.propTypes = {
-  item: PropTypes.shape(PropTypes.string, PropTypes.bool, PropTypes.number),
+  item: PropTypes.objectOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number])
+  ),
   dataKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 

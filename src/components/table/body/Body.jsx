@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Panel from '../panel/Panel';
 import DataTable from '../data-table/DataTable';
+import { cloneDeep } from 'lodash';
 
 class Body extends React.Component {
   constructor(props) {
@@ -12,36 +13,53 @@ class Body extends React.Component {
     };
   }
   flatDataSource = (data = [], parent = {}, visible = true) => {
-    return data.reduce((acc, item) => {
+    const cloneData = cloneDeep(data);
+    return cloneData.reduce((acc, item) => {
       if (Object.keys(parent).length > 0) {
         item.parentId = parent.id;
         item.id = `${item.id}-${parent.id}`;
       } else {
         item.parentId = null;
       }
-      item.expanded = false;
-
       if (item.categories) {
-        item.hasChilds = true;
-        item.childName = 'categories';
-        item.visible = visible;
-        item.class = 'category';
-
-        return [...acc, item, ...this.flatDataSource(item.categories, item, false)];
+        return [
+          ...acc,
+          {
+            ...item,
+            categories: null,
+            hasChilds: true,
+            visible: visible,
+            class: 'category',
+            expanded: false,
+          },
+          ...this.flatDataSource(item.categories, item, false),
+        ];
       }
 
       if (item.items) {
-        item.hasChilds = true;
-        item.childName = 'items';
-        item.visible = visible;
-        item.class = 'item';
-
-        return [...acc, item, ...this.flatDataSource(item.items, item, false)];
+        return [
+          ...acc,
+          {
+            ...item,
+            hasChilds: true,
+            items: null,
+            visible: visible,
+            class: 'item',
+            expanded: false,
+          },
+          ...this.flatDataSource(item.items, item, false),
+        ];
       }
 
-      item.hasChilds = false;
-      item.visible = visible;
-      return [...acc, item];
+      return [
+        ...acc,
+        {
+          ...item,
+          hasChilds: false,
+          visible: visible,
+          expanded: false,
+        },
+      ];
     }, []);
   };
 
@@ -51,54 +69,72 @@ class Body extends React.Component {
     this.setState({ data: flatData });
   }
 
-  close = element => {
-    element.expanded = false;
-    element.visible = false;
-    return element;
-  };
-  open = element => {
-    element.expanded = true;
-    element.visible = true;
-    return element;
-  };
+  // toggleChilds = (element, array, trueOrFalse) => {
+  //   array.forEach(el => {
+  //     if (el.parentId === element.id) {
+  //       el.visible = trueOrFalse;
+  //     }
+  //   });
+  // };
 
-  toggleElement = element => {
+  // toggleElement = element => {
+  //   const { data } = this.state;
+  //   const index = data.indexOf(element);
+  //   const clone = cloneDeep(data);
+  //   const isExpand = (clone[index].expanded = !clone[index].expanded);
+  //   if (element.hasChilds) {
+  //     return clone.map((el, i, arr) => {
+  //       if (el.parentId === element.id) {
+  //         el.visible = !el.visible;
+  //         isExpand ? (el.expanded = false) : (el.expanded = true);
+  //         if (el.hasChilds) {
+  //           this.toggleChilds(el, arr, false);
+  //         }
+  //       }
+  //       return el;
+  //     });
+  //   }
+  //   return clone;
+  // };
+
+  toggleElement(element) {
     const { data } = this.state;
-    const index = data.indexOf(element);
-    data[index].expanded = !data[index].expanded;
+    const isExpand = (element.expanded = !element.expanded);
+    const parents = [];
+    if (element.hasChilds) {
+      parents.push(element.id);
+    }
 
-    const chData = data.map(el => {
-      if (el.parentId === data[index].id) {
-        if (!data[index].expanded) {
-          el.expanded = false;
+    return data.map(el => {
+      if (isExpand) {
+        if (parents.indexOf(el.parentId) !== -1) {
+          el.visible = true;
         }
-        el.visible = !el.visible;
-        if (el.hasChilds && !data[index].expanded) {
-          el[el.childName].forEach(e => {
-            e.visible = false;
-            e.expanded = false;
-          });
+      } else {
+        if (parents.indexOf(el.parentId) !== -1) {
+          el.visible = false;
+          el.expanded = false;
+          if (el.hasChilds) {
+            parents.push(el.id);
+          }
         }
       }
-
       return el;
     });
-
-    return chData;
-  };
+  }
 
   handleClick(element) {
     const changedData = this.toggleElement(element);
-
     this.setState({ data: changedData });
   }
 
   render() {
     const { data } = this.state;
+
     const { dataKeys } = this.props;
     const filteredData = data.filter(el => el.visible);
     return (
-      <div className="body">
+      <div className="body" key="key">
         {filteredData.map(el => {
           const expanded = el.expanded;
           const hasChilds = el.hasChilds;
@@ -112,7 +148,7 @@ class Body extends React.Component {
               hasChilds={el.hasChilds}
             />
           ) : (
-            <DataTable item={el} dataKeys={dataKeys} />
+            <DataTable key={el.id} item={el} dataKeys={dataKeys} />
           );
         })}
       </div>
