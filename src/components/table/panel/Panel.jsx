@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 
 const Panel = props => {
   const { title, expanded, className, hasChilds, onClick } = props;
+  const classPanel = expanded ? `panel ${className} expanded` : `panel ${className}`;
+
   return (
-    <div className={`panel ${className}`} onClick={onClick} aria-hidden>
+    <div className={classPanel} onClick={onClick} aria-hidden>
       {hasChilds ? <span className={expanded ? 'arrow down' : 'arrow'} /> : null}
       <span className="title">{title}</span>
     </div>

@@ -1,7 +1,8 @@
 // Settings
-$bg-wrapper-color: #e4e4e4;
-$bg-header: #d7d7d7;
-$bg-data-table: #f7f7f7;
+$bg-wrapper-color: #f7f7f7;
+$bg-header: #d4d4d4;
+$bg-data-table: #fff;
+$bg-expanded-row: #e2e2e2;
 $wrapper-height: calc(100vh - 60px);
 $border: 1px solid #c4c4c4;
 
@@ -94,7 +95,7 @@ $border: 1px solid #c4c4c4;
         border: none;
       }
       &.item {
-        margin-left: 10px;
+        padding-left: 20px !important;
       }
       &.data {
         padding: 0;
@@ -104,6 +105,9 @@ $border: 1px solid #c4c4c4;
         &:nth-child(even) {
           background-color: #eff9f1;
         }
+      }
+      &.expanded {
+        background-color: $bg-expanded-row;
       }
     }
   }
