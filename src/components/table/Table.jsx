@@ -12,6 +12,8 @@ const Table = props => {
   }, []);
 
   const watchResizeWindow = () => {
+    //TODO React.createRef realization
+    // Need column_id in props for watching
     const tableWidth = document.getElementsByClassName('header')[0].offsetWidth;
     const colWidth = document.getElementsByClassName('header')[0].children[1]
       .offsetWidth;
