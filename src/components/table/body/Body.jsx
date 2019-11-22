@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import Panel from '../panel/Panel';
 import DataTable from '../data-table/DataTable';
 import { cloneDeep } from 'lodash';
+import { connect } from 'react-redux';
+//import { VariableSizeList as List } from 'react-window';
+import { AutoSizer, List } from 'react-virtualized';
 
 class Body extends React.Component {
   constructor(props) {
@@ -31,6 +34,7 @@ class Body extends React.Component {
             visible: visible,
             class: 'category',
             expanded: false,
+            size: 41,
           },
           ...this.flatDataSource(item.categories, item, false),
         ];
@@ -46,6 +50,7 @@ class Body extends React.Component {
             visible: visible,
             class: 'item',
             expanded: false,
+            size: 41,
           },
           ...this.flatDataSource(item.items, item, false),
         ];
@@ -58,6 +63,7 @@ class Body extends React.Component {
           hasChilds: false,
           visible: visible,
           expanded: false,
+          size: item.name.length <= 32 ? 39 : 61,
         },
       ];
     }, []);
@@ -100,28 +106,51 @@ class Body extends React.Component {
     this.setState({ data: changedData });
   }
 
-  render() {
+  rowRenderer = ({ key, index, style }) => {
     const { data } = this.state;
+
     const { dataKeys } = this.props;
     const filteredData = data.filter(el => el.visible);
+
+    const el = filteredData[index];
+    return (
+      <div style={style} key={key}>
+        {el.hasChilds ? (
+          <Panel
+            key={el.id}
+            style={style}
+            title={el.name}
+            onClick={() => this.handleClick(el)}
+            expanded={el.expanded}
+            className={el.class}
+            hasChilds={el.hasChilds}
+          />
+        ) : (
+          <DataTable key={el.id} item={el} dataKeys={dataKeys} />
+        )}
+      </div>
+    );
+  };
+
+  render() {
+    const { data } = this.state;
+    const { height, width } = this.props.flexTable;
+    const filteredData = data.filter(el => el.visible);
+
+    const funct = ({ index }) => {
+      const size = filteredData[index].size;
+      return size;
+    };
+
     return (
       <div className="body" key="key">
-        {filteredData.map(el => {
-          const expanded = el.expanded;
-          const hasChilds = el.hasChilds;
-          return hasChilds ? (
-            <Panel
-              key={el.id}
-              title={el.name}
-              onClick={() => this.handleClick(el)}
-              expanded={expanded}
-              className={el.class}
-              hasChilds={el.hasChilds}
-            />
-          ) : (
-            <DataTable key={el.id} item={el} dataKeys={dataKeys} />
-          );
-        })}
+        <List
+          height={height}
+          rowCount={filteredData.length}
+          rowHeight={index => funct(index)}
+          rowRenderer={this.rowRenderer}
+          width={width}
+        />
       </div>
     );
   }
@@ -131,4 +160,8 @@ Body.propTypes = {
   dataSource: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default Body;
+const mapState = state => ({
+  flexTable: state.flexTable,
+});
+
+export default connect(mapState)(Body);

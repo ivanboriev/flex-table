@@ -5,7 +5,9 @@ $bg-data-table: #fff;
 $bg-expanded-row: #e2e2e2;
 $wrapper-height: calc(100vh - 60px);
 $border: 1px solid #c4c4c4;
-
+body {
+  height: 100vh;
+}
 .table_wrapper {
   background-color: $bg-wrapper-color;
   max-height: $wrapper-height;

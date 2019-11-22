@@ -1,10 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Header from './header/Header';
 import Body from './body/Body';
 import './Table.scss';
 
 const Table = props => {
+  useEffect(() => {
+    watchResizeWindow();
+    window.addEventListener('resize', watchResizeWindow);
+  }, []);
+
+  const watchResizeWindow = () => {
+    const tableWidth = document.getElementsByClassName('header')[0].offsetWidth;
+    const colWidth = document.getElementsByClassName('header')[0].children[1]
+      .offsetWidth;
+    props.setWidthAndHeightAndColWidth({
+      width: tableWidth,
+      height: 400,
+      colWidth: colWidth,
+    });
+  };
   const { dataSource, header, columns } = props;
   const getKeys = arr =>
     arr.reduce((acc, item) => {
@@ -36,4 +52,15 @@ Table.propTypes = {
   dataSource: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default Table;
+const mapState = state => ({
+  flexTable: state.flexTable,
+});
+const mapDispatch = dispatch => ({
+  setWidthAndHeight: payload =>
+    dispatch({ type: 'SET_WIDTH_AND_HEIGHT', payload }),
+  setWidthAndHeightAndColWidth: payload =>
+    dispatch({ type: 'SET_WIDTH_AND_HEIGHT_AND_COL_WIDTH', payload }),
+  setColWidth: payload => dispatch({ type: 'SET_COL_WIDTH', payload }),
+});
+
+export default connect(mapState, mapDispatch)(Table);
