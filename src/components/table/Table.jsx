@@ -17,7 +17,7 @@ const Table = props => {
       .offsetWidth;
     props.setWidthAndHeightAndColWidth({
       width: tableWidth,
-      height: 400,
+      height: 600,
       colWidth: colWidth,
     });
   };
@@ -38,6 +38,10 @@ const Table = props => {
         {header && <Header columns={columns} />}
         {dataSource && <Body dataSource={dataSource} dataKeys={dataKeys} />}
       </div>
+      <h2>
+        Width: {props.flexTable.width} Height: {props.flexTable.height}{' '}
+        ColWidth: {props.flexTable.colWidth}
+      </h2>
     </div>
   );
 };

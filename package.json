@@ -13,6 +13,7 @@
     "react-window": "^1.8.5",
     "redux": "^4.0.4",
     "redux-actions": "^2.6.5",
+    "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
@@ -48,6 +49,7 @@
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
     "node-sass": "^4.13.0",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "redux-devtools": "^3.5.0"
   }
 }
