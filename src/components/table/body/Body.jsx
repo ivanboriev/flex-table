@@ -34,7 +34,7 @@ class Body extends React.Component {
             visible: visible,
             class: 'category',
             expanded: false,
-            size: 41,
+            resizable: false,
           },
           ...this.flatDataSource(item.categories, item, false),
         ];
@@ -50,7 +50,7 @@ class Body extends React.Component {
             visible: visible,
             class: 'item',
             expanded: false,
-            size: 41,
+            resizable: false,
           },
           ...this.flatDataSource(item.items, item, false),
         ];
@@ -63,7 +63,7 @@ class Body extends React.Component {
           hasChilds: false,
           visible: visible,
           expanded: false,
-          size: item.name.length <= 32 ? 39 : 61,
+          resizable: true,
         },
       ];
     }, []);
@@ -111,6 +111,7 @@ class Body extends React.Component {
 
     const { dataKeys } = this.props;
     const filteredData = data.filter(el => el.visible);
+    const ref = React.createRef();
 
     const el = filteredData[index];
     return (
@@ -118,6 +119,7 @@ class Body extends React.Component {
         {el.hasChilds ? (
           <Panel
             key={el.id}
+            ref={ref}
             style={style}
             title={el.name}
             onClick={() => this.handleClick(el)}
@@ -126,7 +128,7 @@ class Body extends React.Component {
             hasChilds={el.hasChilds}
           />
         ) : (
-          <DataTable key={el.id} item={el} dataKeys={dataKeys} />
+          <DataTable key={el.id} item={el} index={index} dataKeys={dataKeys} />
         )}
       </div>
     );
@@ -134,12 +136,29 @@ class Body extends React.Component {
 
   render() {
     const { data } = this.state;
-    const { height, width } = this.props.flexTable;
+    const { height, width, colWidth } = this.props.flexTable;
     const filteredData = data.filter(el => el.visible);
 
-    const funct = ({ index }) => {
-      const size = filteredData[index].size;
-      return size;
+    const getRowSize = (arr, { index }, hw) => {
+      if (!arr[index].resizable) {
+        return 41;
+      }
+      const chars = arr[index].name.length;
+      const containerWidth = hw;
+
+      const defHeight = 41;
+      const checkboxWidth = 35;
+      const charWidth = 8.5; // !: примерная ширина символа... другого решения придумать не могу, к несчастью...
+
+      const strWidth = charWidth * chars; // *: расчетная ширина строки.
+      const maxStrWidth = containerWidth - 16; // *: максимально возможная ширина строки.
+
+      const lineIncrease = 20; // *: значение, на которое увеличим строку.
+      const increaseRaito = Math.floor(strWidth / maxStrWidth); // *: коэфициент увеличеиня строки
+
+      return !increaseRaito
+        ? defHeight
+        : defHeight + lineIncrease * increaseRaito;
     };
 
     return (
@@ -147,7 +166,7 @@ class Body extends React.Component {
         <List
           height={height}
           rowCount={filteredData.length}
-          rowHeight={index => funct(index)}
+          rowHeight={index => getRowSize(filteredData, index, colWidth)}
           rowRenderer={this.rowRenderer}
           width={width}
         />
