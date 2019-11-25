@@ -43,9 +43,9 @@ class Body extends React.Component {
             ...item,
             hasChilds: true,
             items: null,
-            visible: visible,
             class: 'item', // ?: class - зарезервированное слово, лучше className
             expanded: false,
+            visible,
           },
           ...this.flatDataSource(item.items, item, false),
         ];
@@ -71,27 +71,35 @@ class Body extends React.Component {
 
   toggleElement(element) {
     const { data } = this.state;
-    const isExpand = (element.expanded = !element.expanded); // ?: мутация, плюс неочевидно, что происходит, возможно переписать?
+    const isExpand = !element.expanded;
     const parents = [];
-    if (element.hasChilds) {
-      parents.push(element.id); // ?: возможно написать метод по получению парентов? слишком большая ответственность у метода, плюс мутации.
-    }
-
+    
     return data.map(el => {
-      if (isExpand) {
-        if (parents.indexOf(el.parentId) !== -1) { // ?: parents.includes(el.parentId)
-          el.visible = true; // ?: мутация
-        }
-      } else { // ?: тут можно обойтись ранним ретерном, чем меньше вложенность, тем лучше.
-        if (parents.indexOf(el.parentId) !== -1) { // ?: parents.includes(el.parentId)
-          el.visible = false; // ?: мутация
-          el.expanded = false; // ?: мутация
-          if (el.hasChilds) {
-            parents.push(el.id); // ?: Зачем на этом этапе заполняется массив парентов? он больше нигде не используестся
-          }
-        }
+      if (el.id === element.id) {
+        parents.push(el.id);
+        return ({
+          ...el,
+          expanded: isExpand,
+        })
       }
-      return el; // ?: можно избавиться, за счет раннего ретерна
+      if (parents.includes(el.parentId)) {
+        if (el.hasChilds) {
+          parents.push(el.id);
+        }
+        if (isExpand && element.id === el.parentId) {
+          return ({
+            ...el,
+            visible: true,
+            expanded: false,
+          });
+        }
+        return ({
+          ...el,
+          visible: false,
+          expanded: parents.includes(el.parentId),
+        });
+      }
+      return {...el}
     });
   }
 
@@ -103,6 +111,9 @@ class Body extends React.Component {
   render() {
     const { data } = this.state;
     const { dataKeys } = this.props;
+
+    // console.log(data)
+
     const filteredData = data.filter(el => el.visible);
     return (
       <div className="body" key="key">
