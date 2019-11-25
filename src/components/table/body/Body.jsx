@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Panel from '../panel/Panel';
 import DataTable from '../data-table/DataTable';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash'; // ?: Есть смысл использовать дипклон тут?
 
 class Body extends React.Component {
   constructor(props) {
@@ -13,13 +13,13 @@ class Body extends React.Component {
     };
   }
   flatDataSource = (data = [], parent = {}, visible = true) => {
-    const cloneData = cloneDeep(data);
+    const cloneData = cloneDeep(data); // ?: Есть смысл использовать дипклон тут?
     return cloneData.reduce((acc, item) => {
       if (Object.keys(parent).length > 0) {
-        item.parentId = parent.id;
-        item.id = `${item.id}-${parent.id}`;
+        item.parentId = parent.id; // ?: мутация
+        item.id = `${item.id}-${parent.id}`;  // ?: мутация
       } else {
-        item.parentId = null;
+        item.parentId = null; // ?: мутация
       }
       if (item.categories) {
         return [
@@ -29,7 +29,7 @@ class Body extends React.Component {
             categories: null,
             hasChilds: true,
             visible: visible,
-            class: 'category',
+            class: 'category',  // ?: class - зарезервированное слово, лучше className
             expanded: false,
           },
           ...this.flatDataSource(item.categories, item, false),
@@ -43,9 +43,9 @@ class Body extends React.Component {
             ...item,
             hasChilds: true,
             items: null,
-            visible: visible,
-            class: 'item',
+            class: 'item', // ?: class - зарезервированное слово, лучше className
             expanded: false,
+            visible,
           },
           ...this.flatDataSource(item.items, item, false),
         ];
@@ -71,27 +71,35 @@ class Body extends React.Component {
 
   toggleElement(element) {
     const { data } = this.state;
-    const isExpand = (element.expanded = !element.expanded);
+    const isExpand = !element.expanded;
     const parents = [];
-    if (element.hasChilds) {
-      parents.push(element.id);
-    }
-
+    
     return data.map(el => {
-      if (isExpand) {
-        if (parents.indexOf(el.parentId) !== -1) {
-          el.visible = true;
-        }
-      } else {
-        if (parents.indexOf(el.parentId) !== -1) {
-          el.visible = false;
-          el.expanded = false;
-          if (el.hasChilds) {
-            parents.push(el.id);
-          }
-        }
+      if (el.id === element.id) {
+        parents.push(el.id);
+        return ({
+          ...el,
+          expanded: isExpand,
+        })
       }
-      return el;
+      if (parents.includes(el.parentId)) {
+        if (el.hasChilds) {
+          parents.push(el.id);
+        }
+        if (isExpand && element.id === el.parentId) {
+          return ({
+            ...el,
+            visible: true,
+            expanded: false,
+          });
+        }
+        return ({
+          ...el,
+          visible: false,
+          expanded: parents.includes(el.parentId),
+        });
+      }
+      return {...el}
     });
   }
 
@@ -103,14 +111,17 @@ class Body extends React.Component {
   render() {
     const { data } = this.state;
     const { dataKeys } = this.props;
+
+    // console.log(data)
+
     const filteredData = data.filter(el => el.visible);
     return (
       <div className="body" key="key">
         {filteredData.map(el => {
-          const expanded = el.expanded;
-          const hasChilds = el.hasChilds;
+          const expanded = el.expanded; // ?: тут, в принципе, можно не записывать в переменную значения, но если писать, то через деструктуризацию в данном случае
+          const hasChilds = el.hasChilds; // ?: тут, в принципе, можно не записывать в переменную значения, но если писать, то через деструктуризацию в данном случае
           return hasChilds ? (
-            <Panel
+            <Panel // ?: ExpandingRow или ContainerRow или еще что-то семантически более близкое к тому что делает строка
               key={el.id}
               title={el.name}
               onClick={() => this.handleClick(el)}

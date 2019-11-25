@@ -1,0 +1,27 @@
+[
+  {
+    "key": "date",
+    "title": "Дата",
+    "index": "date"
+  },
+  {
+    "key": "name",
+    "title": "Номенклатура",
+    "index": "name"
+  },
+  {
+    "key": "price",
+    "title": "Цена",
+    "index": "price"
+  },
+  {
+    "key": "quantity",
+    "title": "Количество",
+    "index": "quantity"
+  },
+  {
+    "key": "sum",
+    "title": "Сумма",
+    "index": "sum"
+  }
+]
